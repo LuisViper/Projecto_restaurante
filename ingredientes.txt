@@ -1,4 +1,4 @@
-#código--nombre----precioUnitario---descripciónUnidad---inventario---mínimo 
+#código--nombre----precioUnitario---descripciónUnidad---inventario---mínimo
 10 *frijoles rojos *2000  *porción 200 gr  *50  *10 
 20 *arroz blanco   *1000   *libra              *40    *10 
 30 *harina fina    *200   *libra        *8     *3 
