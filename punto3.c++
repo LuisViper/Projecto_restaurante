@@ -43,10 +43,10 @@ float calcularPrecio(Plato* plato, Ingredientes* ingredientes, int nIngredientes
 
     for(int i=0;i<plato->numIngredintes;i++){
 
-        IngredientePlato* ingredienteActual = (plato->ingredientesPlato + i);
+        IngredientePlato* ingredienteActual = (plato+i)->ingredientesPlato;
 
-        char* codigo = ingredienteActual->codigoIngrediente;
-        int cantidad = ingredienteActual->cantidad;
+        char* codigo = (ingredienteActual+i)->codigoIngrediente;
+        int cantidad = (ingredienteActual+i)->cantidad;
 
         int pos = buscarIngrediente(ingredientes,nIngredientes,codigo);
 
