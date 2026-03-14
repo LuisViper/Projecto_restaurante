@@ -1,8 +1,10 @@
 #include <iostream>
-#include <cstring>
 #include <fstream>
+#include <cstring>
 #include <iomanip>
+
 using namespace std;
+
 struct Ingredientes{
     char codigo[100];
     char nombre[100];
@@ -11,91 +13,74 @@ struct Ingredientes{
     int inventario;
     int minimo;
 };
-void agregarIngrediente(Ingredientes* ingredientes, char nombre_archivo[]){
 
-    int contador = 0;
-    int token_n = 0;
-    ifstream archivoEntrada(nombre_archivo);
+struct IngredientePlato{
+    char codigoIngrediente[100];
+    int cantidad;
+};
 
-    if(!archivoEntrada.is_open()){
-        cout << "Hubo un error para abrir el archivo" << endl;
-    }
+struct Plato{
+    char codigo[100];
+    char nombre[100];
+    IngredientePlato* ingredientesPlato;
+    int numIngredintes;
+};
 
-    char linea[100];
+int buscarIngrediente(Ingredientes* ingredientes, int nIngredientes, char* codigo){
 
-    while(archivoEntrada.getline(linea,100)){
-        if(linea[0] == '#'){
-            continue;
-        }
-        if(linea[0] == '0'){
-            break;
-        }
-        else{
-            char* codigo = strtok(linea,"*");
-            strcpy((ingredientes + contador)->codigo,codigo);
-            char* nombre = strtok(nullptr,"*");
-            strcpy((ingredientes + contador)->nombre,nombre);
-            char* preciou = strtok(nullptr,"*");
-            token_n = atoi(preciou);
-            (ingredientes + contador)->precioUnitario = token_n;
-            char* descrip = strtok(nullptr,"*");
-            strcpy((ingredientes + contador)->descripcion_unidad,descrip);
-            char* invetario = strtok(nullptr,"*");
-            token_n = atoi(invetario);
-            (ingredientes + contador)->inventario = token_n;
-            char* minimo = strtok(nullptr,"*");
-            token_n = atoi(minimo);
-            (ingredientes + contador)->minimo = token_n;
-            contador++;
+    for(int i=0;i<nIngredientes;i++){
+        if(strcmp((ingredientes+i)->codigo,codigo)==0){
+            return i;
         }
     }
-    archivoEntrada.close();
-}
-//Punto 3
-int cantidadplatos(char nombre_Archivo[]){
-int nplato=0;
-char* linea = new char [200];
-ifstream archivo(nombre_Archivo);
-archivo.getline(linea,200);
-while(archivo.getline(linea,200)){
-    nplato++;
-}
-delete [] linea;
-return nplato;
+
+    return -1;
 }
 
-void calcularPrecio(Ingredientes* ingredientes, int n){
-float preciofinal[100];
-for (int i = 0; i<n; i++){
-preciofinal[i] =((ingredientes + i)->precioUnitario)*1.19;
-(ingredientes + i)->precioUnitario=preciofinal[i];
-}
-}
-void imprimirmenu(Ingredientes* ingredientes, int n){
-calcularPrecio(ingredientes, n);
-cout<<"--MENU DEL RESTAURANTE: lista de platos ofrecidos:"<<endl;
-    cout << left << setw(10) << "Codigo"
-     << setw(20) << "Nombre"
-     << setw(10) << "Precio"
-     << endl;
-for (int i = 0; i<n; i++){
-     cout << left << setw(10) << (ingredientes + i)->codigo
-     << setw(20) << (ingredientes + i)->nombre
-     << setw(10) << (ingredientes + i)->precioUnitario
-     << endl;
-}
+float calcularPrecio(Plato* plato, Ingredientes* ingredientes, int nIngredientes){
+
+    float precioBase = 0;
+
+    for(int i=0;i<plato->numIngredintes;i++){
+
+        IngredientePlato* ingredienteActual =
+        (plato->ingredientesPlato + i);
+
+        char* codigo = ingredienteActual->codigoIngrediente;
+        int cantidad = ingredienteActual->cantidad;
+
+        int pos = buscarIngrediente(ingredientes,nIngredientes,codigo);
+
+        if(pos != -1){
+
+            int precioUnitario = (ingredientes+pos)->precioUnitario;
+
+            precioBase += precioUnitario * cantidad;
+
+        }
+    }
+
+    float precioFinal = precioBase * 1.19;
+
+    return precioFinal;
 }
 
+void mostrarMenu(Plato* platos,int nPlatos,Ingredientes* ingredientes,int nIngredientes){
 
-int main(){
-char nombre_Archivo[20];
-cout<<"Ingrese el nombre del archivo: ";
-cin>>nombre_Archivo;
-int nplato;
-char preciofinal;
-nplato =cantidadplatos(nombre_Archivo);
-Ingredientes* ingredientes = new Ingredientes[nplato];
-agregarIngrediente(ingredientes,nombre_Archivo);
-calcularPrecio(ingredientes, nplato);
-imprimirmenu(ingredientes, nplato);
+    cout<<left<<setw(10)<<"codigo"
+        <<setw(20)<<"nombre"
+        <<setw(10)<<"precio"<<endl;
+
+    for(int i=0;i<nPlatos;i++){
+
+        Plato* platoActual = (platos+i);
+
+        float precio = calcularPrecio(platoActual,ingredientes,nIngredientes);
+
+        cout<<left<<setw(10)<<platoActual->codigo
+            <<setw(20)<<platoActual->nombre
+            <<setw(10)<<precio<<endl;
+
+    }
+
 }
