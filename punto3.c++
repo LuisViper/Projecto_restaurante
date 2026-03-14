@@ -19,9 +19,9 @@ struct Plato
     IngredientePlato *ingredientes;
     int numIngredientes;
 };
-int buscarIngrediente(Ingrediente *ingredientes, int nIngredientes, int codigo)
+int buscarIngrediente(Ingrediente *ingredientes, int n, int codigo)
 {
-    for(int i = 0; i < nIngredientes; i++)
+    for(int i = 0; i < n; i++)
     {
         if(ingredientes[i].codigo == codigo)
         {
@@ -30,14 +30,14 @@ int buscarIngrediente(Ingrediente *ingredientes, int nIngredientes, int codigo)
     }
     return -1;
 }
-float calcularPrecio(Plato *plato, Ingrediente *ingredientes, int nIngredientes)
+float calcularPrecio(Plato *plato, Ingrediente *ingredientes, int n)
 {
     float precioBase = 0;
-    for(int i = 0; i < plato->numIngredientes; i++)
+    for(int i = 0; i < plato->n; i++)
     {
         int cod = plato->ingredientes[i].codigoIngrediente;
         int cant = plato->ingredientes[i].cantidad;
-        int pos = buscarIngrediente(ingredientes, nIngredientes, cod);
+        int pos = buscarIngrediente(ingredientes, n, cod);
         if(pos != -1)
         {
             precioBase += ingredientes[pos].precioUnitario * cant;
@@ -46,7 +46,7 @@ float calcularPrecio(Plato *plato, Ingrediente *ingredientes, int nIngredientes)
     float precioFinal = precioBase * 1.19;
     return precioFinal;
 }
-void mostrarMenu(Plato *platos, int nPlatos, Ingrediente *ingredientes, int nIngredientes)
+void mostrarMenu(Plato *platos, int nPlatos, Ingrediente *ingredientes, int n)
 {
     cout << "Menu: lista de platos ofrecidos:" << endl;
     cout << endl;
@@ -55,7 +55,7 @@ void mostrarMenu(Plato *platos, int nPlatos, Ingrediente *ingredientes, int nIng
          << setw(10) << "precio" << endl;
     for(int i = 0; i < nPlatos; i++)
     {
-        float precio = calcularPrecio(&platos[i], ingredientes, nIngredientes);
+        float precio = calcularPrecio(&platos[i], ingredientes, n);
         cout << left << setw(10) << platos[i].codigo
              << setw(20) << platos[i].nombre
              << setw(10) << precio
