@@ -1,8 +1,8 @@
 #código--nombre----precioUnitario---descripciónUnidad---inventario---mínimo
-10 *frijoles rojos *2000  *porción 200 gr  *50  *10 
-20 *arroz blanco   *1000   *libra              *40    *10 
-30 *harina fina    *200   *libra        *8     *3 
-40 *chicharrón seco  *1500   *porción 100 gr       *70    *15 
-50 *tomate maduro *800        *libra   *20  *5 
-60 *carne molida *1000  *porción 300 gr     *40  *10 
+10*frijoles rojos*2000*porción 200 gr*50*10 
+20*arroz blanco*1000*libra*40*10 
+30*harina fina*200*libra*8*3 
+40*chicharrón seco*1500*porción 100 gr*70*15 
+50*tomate maduro*800*libra*20*5 
+60*carne molida*1000*porción 300 gr*40*10 
 0

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <iomanip>
 
 using namespace std;
 
@@ -194,10 +195,61 @@ void mostrar_platos(Plato* platos, int cantidad_platos){
     }
 }
 
+// PUNTO 3
+
+int buscarIngrediente(Ingredientes* ingredientes, int nIngredientes, const char* codigo)
+{
+    for(int i = 0; i < nIngredientes; i++)
+    {
+        if(strcmp(ingredientes[i].codigo, codigo) == 0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+float calcularPrecio(Plato* plato, Ingredientes* ingredientes, int nIngredientes)
+{
+    float precioBase = 0;
+    for(int i = 0; i < plato->numIngredintes; i++)
+    {
+        const char* cod = plato->vector_ingredientes[i].codigoIngrediente;
+        int cant = plato->vector_ingredientes[i].cantidad;
+        int pos = buscarIngrediente(ingredientes, nIngredientes, cod);
+        if(pos != -1)
+        {
+            precioBase += ingredientes[pos].precioUnitario * cant;
+        }
+    }
+    float precioFinal = precioBase * 1.19;
+    return precioFinal;
+}
+
+void mostrarMenu(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nIngredientes)
+{
+    cout << "Menu: lista de platos ofrecidos:" << endl;
+    cout << endl;
+    cout << left << setw(10) << "codigo"
+         << setw(20) << "nombre"
+         << setw(10) << "precio" << endl;
+    for(int i = 0; i < nPlatos; i++)
+    {
+        float precio = calcularPrecio(&platos[i], ingredientes, nIngredientes);
+        cout << left << setw(10) << platos[i].codigo
+             << setw(20) << platos[i].nombre
+             << setw(10) << precio
+             << endl;
+    }
+}
+
+// FIN PUNTO 3
+
+
+
 int main(){
 
     ifstream archivoEntradaPlatos("platos.txt");
-
     char linea[500];
 
     int numero_platos = 0;
@@ -209,70 +261,80 @@ int main(){
     archivoEntradaPlatos.close();
 
     Plato* platos = new Plato[numero_platos];
-
     asignar_tam_v_ingredientes(platos);
 
+    Ingredientes* ingredientes = nullptr;
+    int tam = 0;
+
     int opcion;
-    
-    cout << "1. Cargar ingredientes" << endl;
-    cout << "2. Cargar platos" << endl;
-    cout << "3. Salir" << endl;
-    cin >> opcion;
-    switch(opcion){
-    
-        case 1:{
-    
-            int tam = 0;
-            char linea[100];
-    
-            ifstream archivoEntradaIngredientes("ingredientes.txt");
-    
-            if (!archivoEntradaIngredientes.is_open()) {
-                cerr << "No se pudo abrir el archivo para lectura." << endl;
-                return 1;
-            }
-    
-            while(archivoEntradaIngredientes.getline(linea,100)){
-                tam++;
-            }
-    
-            tam -= 2;
-    
-            archivoEntradaIngredientes.close();
-    
-            Ingredientes* ingredientes = new Ingredientes[tam];
-    
-            agregarIngrediente(ingredientes);
-    
-            for(int i = 0; i < tam; i++){
-                cout << "Codigo: " << (ingredientes + i)->codigo << endl;
-                cout << "Nombre: " << (ingredientes + i)->nombre << endl;
-                cout << "Precio Unitario: " << (ingredientes + i)->precioUnitario << endl;
-                cout << "Descripcion Unidad: " << (ingredientes + i)->descripcion_unidad << endl;
-                cout << "Inventario: " << (ingredientes + i)->inventario << endl;
-                cout << "Minimo: " << (ingredientes + i)->minimo << endl;
-                cout << "--------------------------" << endl;
-            }
-    
-            break;
-        }
-    
-        case 2:{
 
-            agregar_plato(platos);
-    
-            mostrar_platos(platos,numero_platos);
+    do {
+        cout << "\n1. Cargar ingredientes" << endl;
+        cout << "2. Cargar platos" << endl;
+        cout << "3. Mostrar menu con precios" << endl;
+        cout << "4. Salir" << endl;
+        cin >> opcion;
 
+        switch(opcion){
+
+            case 1:{
+                char linea[100];
+                ifstream archivoEntradaIngredientes("ingredientes.txt");
+
+                if (!archivoEntradaIngredientes.is_open()) {
+                    cerr << "No se pudo abrir el archivo para lectura." << endl;
+                    break;
+                }
+
+                while(archivoEntradaIngredientes.getline(linea,100)){
+                    tam++;
+                }
+                tam -= 2;
+                archivoEntradaIngredientes.close();
+
+                ingredientes = new Ingredientes[tam];
+                agregarIngrediente(ingredientes);
+
+                for(int i = 0; i < tam; i++){
+                    cout << "Codigo: " << (ingredientes + i)->codigo << endl;
+                    cout << "Nombre: " << (ingredientes + i)->nombre << endl;
+                    cout << "Precio Unitario: " << (ingredientes + i)->precioUnitario << endl;
+                    cout << "Descripcion Unidad: " << (ingredientes + i)->descripcion_unidad << endl;
+                    cout << "Inventario: " << (ingredientes + i)->inventario << endl;
+                    cout << "Minimo: " << (ingredientes + i)->minimo << endl;
+                    cout << "--------------------------" << endl;
+                }
+                break;
+            }
+
+            case 2:{
+                agregar_plato(platos);
+                mostrar_platos(platos, numero_platos);
+                break;
+            }
+
+            case 3:{
+                if(ingredientes == nullptr){
+                    cout << "Primero debe cargar los ingredientes (opcion 1)" << endl;
+                    break;
+                }
+                mostrarMenu(platos, numero_platos, ingredientes, tam);
+                break;
+            }
+
+            case 4:{
+                cout << "Saliendo del programa..." << endl;
+                break;
+            }
+
+            default:{
+                cout << "Opcion invalida" << endl;
+            }
         }
-    
-        case 3:{
-            cout << "Saliendo del programa..." << endl;
-            break;
-        }
-    
-        default:{
-            cout << "Opcion invalida" << endl;
-        }
-    }
+
+    } while(opcion != 4);
+
+    delete[] platos;
+    delete[] ingredientes;
     return 0;
 }
