@@ -1,0 +1,23 @@
+#PLATO
+#código------nombre-------------
+100 *bandeja Paisa
+#ingredientes
+10 2
+20 1
+40 2
+0
+#PLATO
+#código------nombre-------------
+200 *lasagna
+#ingredientes
+30 1
+60 2
+0
+#PLATO
+#código------nombre-------------
+300 *pizza siciliana
+#ingredientes
+30 1
+50 1
+0
+#FIN
