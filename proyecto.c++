@@ -197,53 +197,51 @@ void mostrar_platos(Plato* platos, int cantidad_platos){
 
 // PUNTO 3
 
-int buscarIngrediente(Ingredientes* ingredientes, int nIngredientes, const char* codigo)
-{
-    for(int i = 0; i < nIngredientes; i++)
-    {
-        if(strcmp(ingredientes[i].codigo, codigo) == 0)
-        {
+int buscarIngrediente(Ingredientes* ingredientes, int nIngredientes, char* codigo){
+    for(int i = 0; i < nIngredientes; i++){
+        if(strcmp((ingredientes + i)->codigo, codigo) == 0){
             return i;
         }
     }
     return -1;
 }
 
-float calcularPrecio(Plato* plato, Ingredientes* ingredientes, int nIngredientes)
-{
+float calcularPrecio(Plato* plato, Ingredientes* ingredientes, int nIngredientes){
     float precioBase = 0;
-    for(int i = 0; i < plato->numIngredintes; i++)
-    {
-        const char* cod = plato->vector_ingredientes[i].codigoIngrediente;
-        int cant = plato->vector_ingredientes[i].cantidad;
-        int pos = buscarIngrediente(ingredientes, nIngredientes, cod);
-        if(pos != -1)
-        {
-            precioBase += ingredientes[pos].precioUnitario * cant;
+    IngredientePlato* ingredienteActual = plato->vector_ingredientes;
+    for(int i = 0; i < plato->numIngredintes; i++){
+        char* codigo = (ingredienteActual + i)->codigoIngrediente;
+        int cantidad = (ingredienteActual + i)->cantidad;
+        int pos = buscarIngrediente(ingredientes, nIngredientes, codigo);
+        if(pos != -1){
+            int precioUnitario = (ingredientes + pos)->precioUnitario;
+            precioBase += precioUnitario * cantidad;
         }
     }
     float precioFinal = precioBase * 1.19;
     return precioFinal;
 }
 
-void mostrarMenu(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nIngredientes)
-{
-    cout << "Menu: lista de platos ofrecidos:" << endl;
-    cout << endl;
+void mostrarMenu(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nIngredientes){
     cout << left << setw(10) << "codigo"
          << setw(20) << "nombre"
          << setw(10) << "precio" << endl;
-    for(int i = 0; i < nPlatos; i++)
-    {
-        float precio = calcularPrecio(&platos[i], ingredientes, nIngredientes);
-        cout << left << setw(10) << platos[i].codigo
-             << setw(20) << platos[i].nombre
-             << setw(10) << precio
-             << endl;
+    for(int i = 0; i < nPlatos; i++){
+        Plato* platoActual = (platos + i);
+        float precio = calcularPrecio(platoActual, ingredientes, nIngredientes);
+        cout << left << setw(10) << platoActual->codigo
+             << setw(20) << platoActual->nombre
+             << setw(10) << precio << endl;
     }
 }
 
 // FIN PUNTO 3
+
+// PUNTO 5
+
+
+
+// FIN PUNTO 5
 
 
 
