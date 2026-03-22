@@ -237,13 +237,218 @@ void mostrarMenu(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nIn
 
 // FIN PUNTO 3
 
-// PUNTO 5
+// PUNTO 4
+
+struct PlatoOrden {
+    char codigoPlato[100];
+    int cantidad;
+};
+
+struct Orden {
+    PlatoOrden* platos;
+    int numPlatos;
+    double total;
+};
+
+void agregarOrden(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nIngredientes, Orden* &ordenes, int &nOrdenes) {
+    int tipos;
+    cout << "Cuantos tipos de platos desea ordenar: ";
+    cin >> tipos;
+
+    char** codigos = new char*[tipos];
+    int* cantidades = new int[tipos];
+
+    for (int i = 0; i < tipos; i++) {
+        codigos[i] = new char[100];
+        cout << "Codigo del plato: ";
+        cin >> codigos[i];
+        cout << "Cantidad: ";
+        cin >> cantidades[i];
+    }
+
+    // Validar existencia e inventario
+    for (int i = 0; i < tipos; i++) {
+        Plato* platoActual = nullptr;
+        for (int j = 0; j < nPlatos; j++) {
+            if (strcmp((platos + j)->codigo, codigos[i]) == 0) {
+                platoActual = (platos + j);
+            }
+        }
+        if (platoActual == nullptr) {
+            cout << "Error: el plato con codigo " << codigos[i] << " no existe." << endl;
+            for (int k = 0; k < tipos; k++) delete[] codigos[k];
+            delete[] codigos;
+            delete[] cantidades;
+            return;
+        }
+        for (int k = 0; k < platoActual->numIngredintes; k++) {
+            char* codIng = (platoActual->vector_ingredientes + k)->codigoIngrediente;
+            int cantNecesaria = (platoActual->vector_ingredientes + k)->cantidad * cantidades[i];
+            int pos = buscarIngrediente(ingredientes, nIngredientes, codIng);
+            if (pos != -1 && (ingredientes + pos)->inventario < cantNecesaria) {
+                cout << "Error: inventario insuficiente para el ingrediente " << codIng << endl;
+                for (int k2 = 0; k2 < tipos; k2++) delete[] codigos[k2];
+                delete[] codigos;
+                delete[] cantidades;
+                return;
+            }
+        }
+    }
+
+    // Registrar orden y calcular total
+    double total = 0;
+    for (int i = 0; i < tipos; i++) {
+        Plato* platoActual = nullptr;
+        for (int j = 0; j < nPlatos; j++) {
+            if (strcmp((platos + j)->codigo, codigos[i]) == 0) {
+                platoActual = (platos + j);
+            }
+        }
+        double precioPlato = 0;
+        for (int k = 0; k < platoActual->numIngredintes; k++) {
+            char* codIng = (platoActual->vector_ingredientes + k)->codigoIngrediente;
+            int cant = (platoActual->vector_ingredientes + k)->cantidad;
+            int pos = buscarIngrediente(ingredientes, nIngredientes, codIng);
+            if (pos != -1) {
+                precioPlato += (ingredientes + pos)->precioUnitario * cant;
+                (ingredientes + pos)->inventario -= cant * cantidades[i];
+            }
+        }
+        precioPlato *= 1.19;
+        total += precioPlato * cantidades[i];
+    }
+
+    // Guardar la orden en el arreglo de ordenes
+    Orden* nuevasOrdenes = new Orden[nOrdenes + 1];
+    for (int i = 0; i < nOrdenes; i++) {
+        (nuevasOrdenes + i)->numPlatos = (ordenes + i)->numPlatos;
+        (nuevasOrdenes + i)->total = (ordenes + i)->total;
+        (nuevasOrdenes + i)->platos = (ordenes + i)->platos;
+    }
+    (nuevasOrdenes + nOrdenes)->numPlatos = tipos;
+    (nuevasOrdenes + nOrdenes)->total = total;
+    (nuevasOrdenes + nOrdenes)->platos = new PlatoOrden[tipos];
+    for (int i = 0; i < tipos; i++) {
+        strcpy(((nuevasOrdenes + nOrdenes)->platos + i)->codigoPlato, codigos[i]);
+        ((nuevasOrdenes + nOrdenes)->platos + i)->cantidad = cantidades[i];
+    }
+
+    delete[] ordenes;
+    ordenes = nuevasOrdenes;
+    nOrdenes++;
+
+    cout << "Orden registrada correctamente." << endl;
+    cout << "Total a pagar: " << total << endl;
+
+    for (int i = 0; i < tipos; i++) delete[] codigos[i];
+    delete[] codigos;
+    delete[] cantidades;
+}
+
+// FIN PUNTO 4
+
+// FUNCION 5
+
+int* mostrarMasSolicitados(Plato* platos, int nPlatos, Orden* ordenes, int nOrdenes) {
+    int* contador = new int[nPlatos];
+    for (int i = 0; i < nPlatos; i++) {
+        *(contador + i) = 0;
+    }
+    for (int i = 0; i < nOrdenes; i++) {
+        for (int j = 0; j < (ordenes + i)->numPlatos; j++) {
+            char* cod = ((ordenes + i)->platos + j)->codigoPlato;
+            int cant = ((ordenes + i)->platos + j)->cantidad;
+            for (int k = 0; k < nPlatos; k++) {
+                if (strcmp((platos + k)->codigo, cod) == 0) {
+                    *(contador + k) += cant;
+                }
+            }
+        }
+    }
+    cout << "PLATOS MAS SOLICITADOS:" << endl;
+    cout << left << setw(10) << "codigo" << setw(20) << "nombre" << setw(10) << "solicitudes" << endl;
+    for (int i = 0; i < 3; i++) {
+        int max = -1;
+        int pos = -1;
+        for (int j = 0; j < nPlatos; j++) {
+            if (*(contador + j) > max) {
+                max = *(contador + j);
+                pos = j;
+            }
+        }
+        if (pos != -1) {
+            cout << left << setw(10) << (platos + pos)->codigo
+                 << setw(20) << (platos + pos)->nombre
+                 << setw(10) << *(contador + pos) << endl;
+            *(contador + pos) = -1;
+        }
+    }
+    return contador;
+}
+
+struct Plato_final_precio{
+    char codigo[100];
+    char nombre[100];
+
+    float precio_final;
+};
+
+// PUNTO 6
+
+void Platos_mas_rentables(Plato* platos, int nPlatos, Orden* ordenes, int nOrdenes, Ingredientes* ingredientes,int nIngredientes){
+
+    int* contador = new int[nPlatos];
+    for (int i = 0; i < nPlatos; i++) {
+        *(contador + i) = 0;
+    }
+    for (int i = 0; i < nOrdenes; i++) {
+        for (int j = 0; j < (ordenes + i)->numPlatos; j++) {
+            char* cod = ((ordenes + i)->platos + j)->codigoPlato;
+            int cant = ((ordenes + i)->platos + j)->cantidad;
+            for (int k = 0; k < nPlatos; k++) {
+                if (strcmp((platos + k)->codigo, cod) == 0) {
+                    *(contador + k) += cant;
+                }
+            }
+        }
+    }
+
+    Plato_final_precio* plato_final = new Plato_final_precio[nPlatos];
+
+    for(int i = 0; i < nPlatos; i++){
+
+        strcpy((plato_final + i)->nombre,(platos + i)->nombre);
+        strcpy((plato_final + i)->codigo,(platos + i)->codigo);
+        Plato* platoActual = (platos + i);
+        float precio = calcularPrecio(platoActual, ingredientes, nIngredientes);
+        precio *= *(contador + i);
+
+        (plato_final + i)->precio_final = precio;
+    }
+
+    for(int i = 1; i < nPlatos; i++){
+        Plato_final_precio key = *(plato_final + i);
+        int j = i - 1;
+
+        while(j >= 0 && (plato_final + j)->precio_final < key.precio_final){
+            *(plato_final + (j+1)) = *(plato_final + j);
+            j--;
+        }
+        *(plato_final + (j + 1)) = key;
+    }
+
+    for(int i = 0; i < 3; i++){
+    cout << "Codigo: " << (plato_final + i)->codigo << endl;
+    cout << "Nombre: " << (plato_final + i)->nombre << endl;
+    cout << "Precio final: " << (plato_final + i)->precio_final << endl;
+    cout << "--------------------------" << endl;
+
+}
 
 
-
-// FIN PUNTO 5
-
-
+delete[] plato_final;
+delete[] contador;
+}    
 
 int main(){
 
@@ -264,13 +469,21 @@ int main(){
     Ingredientes* ingredientes = nullptr;
     int tam = 0;
 
+    Orden* ordenes = nullptr;
+    int nOrdenes = 0;
+
     int opcion;
 
     do {
         cout << "\n1. Cargar ingredientes" << endl;
         cout << "2. Cargar platos" << endl;
         cout << "3. Mostrar menu con precios" << endl;
-        cout << "4. Salir" << endl;
+        cout << "4. Agregar orden" << endl;
+        cout << "5. Mostrar los platos mas solicitados" << endl;
+        cout << "6. Mostrar los 3 platos mas rentables  " << endl;
+        cout << "7. Salir" << endl;
+
+
         cin >> opcion;
 
         switch(opcion){
@@ -321,8 +534,33 @@ int main(){
             }
 
             case 4:{
-                cout << "Saliendo del programa..." << endl;
+                if (platos == nullptr || ingredientes == nullptr) {
+                    cout << "Primero debe cargar los datos" << endl;
+                } else {
+                    agregarOrden(platos, numero_platos, ingredientes, tam, ordenes, nOrdenes);
+                    
+                }
                 break;
+            }
+
+            case 5:{
+                if (nOrdenes == 0) {
+                    cout << "No hay ordenes registradas." << endl;
+                } else {
+                    int* resultado = mostrarMasSolicitados(platos, numero_platos, ordenes, nOrdenes);
+                    delete[] resultado;
+
+                }
+                break;            
+            }
+
+            case 6:{
+                Platos_mas_rentables(platos,numero_platos,ordenes,nOrdenes,ingredientes,tam);
+                break;            
+            }
+            case 7:{
+                cout << "Saliendo. " << endl;
+                break;            
             }
 
             default:{
@@ -330,8 +568,13 @@ int main(){
             }
         }
 
-    } while(opcion != 4);
+    } while(opcion != 7);
 
+
+    for (int i = 0; i < nOrdenes; i++) {
+        delete[] (ordenes + i)->platos;
+    }
+    delete[] ordenes;
     delete[] platos;
     delete[] ingredientes;
     return 0;
