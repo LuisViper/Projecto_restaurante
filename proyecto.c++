@@ -14,15 +14,14 @@ struct Ingredientes{
     int minimo;  
 };
 
-void agregarIngrediente(Ingredientes* ingredientes){
+// PUNTO 1
+
+void agregarIngrediente(Ingredientes* ingredientes,char* nombrea_archivo_ingrediente){
 
     int contador = 0;
     int token_n = 0;
-    char nombre_archivo[100];
-    cout << "Ingrese el nombre el nombre del archivo" << endl;
-    cin >> nombre_archivo;
     
-    ifstream archivoEntrada(nombre_archivo);
+    ifstream archivoEntrada(nombrea_archivo_ingrediente);
 
     if(!archivoEntrada.is_open()){
         cout << "Hubo un error para abrir el archivo" << endl;
@@ -72,12 +71,12 @@ struct Plato{
     int numIngredintes;
 };
 
-void asignar_tam_v_ingredientes(Plato* platos){
+void asignar_tam_v_ingredientes(Plato* platos, char* Nombre_archivo_platos){
     char linea[500];
 
     int contador = 0;
     int contador_platos = -1;
-    ifstream archivoEntrada("platos.txt");
+    ifstream archivoEntrada(Nombre_archivo_platos);
     while(archivoEntrada.getline(linea,500)){
         if(strcmp(linea,"#ingredientes") == 0){
             contador_platos++;
@@ -98,13 +97,13 @@ void asignar_tam_v_ingredientes(Plato* platos){
     archivoEntrada.close();
 }
 
-void agregar_plato(Plato* platos){
+// FIN PUNTO 1
+// ----------------------------------------------------------------------------------------------------------
+// PUNTO 2
+
+void agregar_plato(Plato* platos, char* nombre_doc){
 
     int contar_ingrediente = 0;
-
-    char nombre_doc[100];
-    cout << "Introduzca el noombre del archivo de texto" << endl;
-    cin >> nombre_doc;
 
     int n_platos = -1;
     bool b_ingredientes = false;
@@ -174,27 +173,30 @@ void agregar_plato(Plato* platos){
     archivoEntrada.close();
 }
 
+
 void mostrar_platos(Plato* platos, int cantidad_platos){
-
+    
     for(int i = 0; i < cantidad_platos; i++){
-
+        
         cout << "Codigo: " << (platos + i)->codigo << endl;
         cout << "Nombre: " << (platos + i)->nombre << endl;
         cout << "Numero de ingredientes: " << (platos + i)->numIngredintes << endl;
-
+        
         for(int j = 0; j < (platos + i)->numIngredintes; j++){
-
+            
             cout << "  Ingrediente: "
-                 << ((platos + i)->vector_ingredientes + j)->codigoIngrediente
-                 << "  Cantidad: "
-                 << ((platos + i)->vector_ingredientes + j)->cantidad
-                 << endl;
+            << ((platos + i)->vector_ingredientes + j)->codigoIngrediente
+            << "  Cantidad: "
+            << ((platos + i)->vector_ingredientes + j)->cantidad
+            << endl;
         }
-
+        
         cout << "----------------------" << endl;
     }
 }
 
+// FIN PUNTO 2
+// ----------------------------------------------------------------------------------------------------------
 // PUNTO 3
 
 int buscarIngrediente(Ingredientes* ingredientes, int nIngredientes, char* codigo){
@@ -236,7 +238,7 @@ void mostrarMenu(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nIn
 }
 
 // FIN PUNTO 3
-
+// ----------------------------------------------------------------------------------------------------------
 // PUNTO 4
 
 struct PlatoOrden {
@@ -250,8 +252,9 @@ struct Orden {
     double total;
 };
 
-void agregarOrden(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nIngredientes, Orden* &ordenes, int &nOrdenes) {
+void agregarOrden(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nIngredientes, Orden* &ordenes, int &nOrdenes, int& numero) {
     int tipos;
+    cout << "AGREGAR ORDEN: " << numero << endl;
     cout << "Cuantos tipos de platos desea ordenar: ";
     cin >> tipos;
 
@@ -266,7 +269,6 @@ void agregarOrden(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nI
         cin >> cantidades[i];
     }
 
-    // Validar existencia e inventario
     for (int i = 0; i < tipos; i++) {
         Plato* platoActual = nullptr;
         for (int j = 0; j < nPlatos; j++) {
@@ -295,7 +297,6 @@ void agregarOrden(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nI
         }
     }
 
-    // Registrar orden y calcular total
     double total = 0;
     for (int i = 0; i < tipos; i++) {
         Plato* platoActual = nullptr;
@@ -318,7 +319,6 @@ void agregarOrden(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nI
         total += precioPlato * cantidades[i];
     }
 
-    // Guardar la orden en el arreglo de ordenes
     Orden* nuevasOrdenes = new Orden[nOrdenes + 1];
     for (int i = 0; i < nOrdenes; i++) {
         (nuevasOrdenes + i)->numPlatos = (ordenes + i)->numPlatos;
@@ -346,7 +346,7 @@ void agregarOrden(Plato* platos, int nPlatos, Ingredientes* ingredientes, int nI
 }
 
 // FIN PUNTO 4
-
+// ----------------------------------------------------------------------------------------------------------
 // FUNCION 5
 
 int* mostrarMasSolicitados(Plato* platos, int nPlatos, Orden* ordenes, int nOrdenes) {
@@ -440,7 +440,7 @@ void Platos_mas_rentables(Plato* platos, int nPlatos, Orden* ordenes, int nOrden
     for(int i = 0; i < 3; i++){
     cout << "Codigo: " << (plato_final + i)->codigo << endl;
     cout << "Nombre: " << (plato_final + i)->nombre << endl;
-    cout << "Precio final: " << (plato_final + i)->precio_final << endl;
+    cout << "Total ventas: " << (plato_final + i)->precio_final << endl;
     cout << "--------------------------" << endl;
 
 }
@@ -449,22 +449,13 @@ void Platos_mas_rentables(Plato* platos, int nPlatos, Orden* ordenes, int nOrden
 delete[] plato_final;
 delete[] contador;
 }    
-
+// ----------------------------------------------------------------------------------------------------------
 int main(){
 
-    ifstream archivoEntradaPlatos("platos.txt");
-    char linea[500];
+    int numero = 1000;
 
+    Plato* platos = nullptr;
     int numero_platos = 0;
-    while(archivoEntradaPlatos.getline(linea,500)){
-        if(strcmp(linea,"#PLATO") == 0){
-            numero_platos++;
-        }
-    }
-    archivoEntradaPlatos.close();
-
-    Plato* platos = new Plato[numero_platos];
-    asignar_tam_v_ingredientes(platos);
 
     Ingredientes* ingredientes = nullptr;
     int tam = 0;
@@ -475,37 +466,40 @@ int main(){
     int opcion;
 
     do {
-        cout << "\n1. Cargar ingredientes" << endl;
+        cout << "1. Cargar ingredientes" << endl;
         cout << "2. Cargar platos" << endl;
         cout << "3. Mostrar menu con precios" << endl;
         cout << "4. Agregar orden" << endl;
         cout << "5. Mostrar los platos mas solicitados" << endl;
-        cout << "6. Mostrar los 3 platos mas rentables  " << endl;
+        cout << "6. Mostrar los 3 platos mas rentables" << endl;
         cout << "7. Salir" << endl;
-
 
         cin >> opcion;
 
         switch(opcion){
 
             case 1:{
+                char nombre_archivo_ing[100];
+                cout << "Ingrese el nombre del archivo de ingredientes: ";
+                cin >> nombre_archivo_ing;
+            
                 char linea[100];
-                ifstream archivoEntradaIngredientes("ingredientes.txt");
-
+                ifstream archivoEntradaIngredientes(nombre_archivo_ing);
+            
                 if (!archivoEntradaIngredientes.is_open()) {
                     cerr << "No se pudo abrir el archivo para lectura." << endl;
                     break;
-                }
-
-                while(archivoEntradaIngredientes.getline(linea,100)){
+                }   
+            
+                while(archivoEntradaIngredientes.getline(linea, 100)){
                     tam++;
                 }
                 tam -= 2;
                 archivoEntradaIngredientes.close();
-
+            
                 ingredientes = new Ingredientes[tam];
-                agregarIngrediente(ingredientes);
-
+                agregarIngrediente(ingredientes, nombre_archivo_ing);
+            
                 for(int i = 0; i < tam; i++){
                     cout << "Codigo: " << (ingredientes + i)->codigo << endl;
                     cout << "Nombre: " << (ingredientes + i)->nombre << endl;
@@ -513,13 +507,31 @@ int main(){
                     cout << "Descripcion Unidad: " << (ingredientes + i)->descripcion_unidad << endl;
                     cout << "Inventario: " << (ingredientes + i)->inventario << endl;
                     cout << "Minimo: " << (ingredientes + i)->minimo << endl;
-                    cout << "--------------------------" << endl;
                 }
                 break;
             }
 
             case 2:{
-                agregar_plato(platos);
+                char nombre_archivo_plato[100];
+                cout << "Ingrese el nombre del archivo de platos: ";
+                cin >> nombre_archivo_plato;
+
+                ifstream archivoEntradaPlatos(nombre_archivo_plato);
+                if(!archivoEntradaPlatos.is_open()){
+                    cerr << "Error abriendo el archivo de platos." << endl;
+                    break;
+                }
+                char linea[500];
+                numero_platos = 0;
+                while(archivoEntradaPlatos.getline(linea, 500)){
+                    if(strcmp(linea, "#PLATO") == 0) numero_platos++;
+                }
+                archivoEntradaPlatos.close();
+
+                platos = new Plato[numero_platos];
+                asignar_tam_v_ingredientes(platos, nombre_archivo_plato);
+
+                agregar_plato(platos, nombre_archivo_plato);
                 mostrar_platos(platos, numero_platos);
                 break;
             }
@@ -529,38 +541,46 @@ int main(){
                     cout << "Primero debe cargar los ingredientes (opcion 1)" << endl;
                     break;
                 }
+                if(platos == nullptr){
+                    cout << "Primero debe cargar los platos (opcion 2)" << endl;
+                    break;
+                }
                 mostrarMenu(platos, numero_platos, ingredientes, tam);
                 break;
             }
 
             case 4:{
-                if (platos == nullptr || ingredientes == nullptr) {
+                if(platos == nullptr || ingredientes == nullptr){
                     cout << "Primero debe cargar los datos" << endl;
                 } else {
-                    agregarOrden(platos, numero_platos, ingredientes, tam, ordenes, nOrdenes);
-                    
+                    agregarOrden(platos, numero_platos, ingredientes, tam, ordenes, nOrdenes, numero);
                 }
+                numero++;
                 break;
             }
 
             case 5:{
-                if (nOrdenes == 0) {
+                if(nOrdenes == 0){
                     cout << "No hay ordenes registradas." << endl;
                 } else {
                     int* resultado = mostrarMasSolicitados(platos, numero_platos, ordenes, nOrdenes);
                     delete[] resultado;
-
                 }
-                break;            
+                break;
             }
 
             case 6:{
-                Platos_mas_rentables(platos,numero_platos,ordenes,nOrdenes,ingredientes,tam);
-                break;            
+                if(platos == nullptr || ingredientes == nullptr){
+                    cout << "Primero debe cargar los datos" << endl;
+                    break;
+                }
+                Platos_mas_rentables(platos, numero_platos, ordenes, nOrdenes, ingredientes, tam);
+                break;
             }
+
             case 7:{
-                cout << "Saliendo. " << endl;
-                break;            
+                cout << "Saliendo." << endl;
+                break;
             }
 
             default:{
@@ -570,8 +590,7 @@ int main(){
 
     } while(opcion != 7);
 
-
-    for (int i = 0; i < nOrdenes; i++) {
+    for(int i = 0; i < nOrdenes; i++){
         delete[] (ordenes + i)->platos;
     }
     delete[] ordenes;
