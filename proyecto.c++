@@ -471,7 +471,7 @@ int main(){
         cout << "3. Mostrar menu con precios" << endl;
         cout << "4. Agregar orden" << endl;
         cout << "5. Mostrar los platos mas solicitados" << endl;
-        cout << "6. Mostrar los 3 platos mas rentables" << endl;
+        cout << "6. Mostrar los 3 plato mas rentables" << endl;
         cout << "7. Salir" << endl;
 
         cin >> opcion;
@@ -513,12 +513,12 @@ int main(){
 
             case 2:{
                 char nombre_archivo_plato[100];
-                cout << "Ingrese el nombre del archivo de platos: ";
+                cout << "Ingrese el nombre del archivo de platoss:";
                 cin >> nombre_archivo_plato;
 
                 ifstream archivoEntradaPlatos(nombre_archivo_plato);
                 if(!archivoEntradaPlatos.is_open()){
-                    cerr << "Error abriendo el archivo de platos." << endl;
+                    cerr << "Error abriendo el archivo de platos" << endl;
                     break;
                 }
                 char linea[500];
@@ -538,11 +538,11 @@ int main(){
 
             case 3:{
                 if(ingredientes == nullptr){
-                    cout << "Primero debe cargar los ingredientes (opcion 1)" << endl;
+                    cout << "Primero debe cargar los ingredientes" << endl;
                     break;
                 }
                 if(platos == nullptr){
-                    cout << "Primero debe cargar los platos (opcion 2)" << endl;
+                    cout << "Primero debe cargar los platos" << endl;
                     break;
                 }
                 mostrarMenu(platos, numero_platos, ingredientes, tam);
@@ -583,9 +583,6 @@ int main(){
                 break;
             }
 
-            default:{
-                cout << "Opcion invalida" << endl;
-            }
         }
 
     } while(opcion != 7);
